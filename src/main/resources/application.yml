@@ -1,0 +1,17 @@
+spring:
+  cloud:
+    stream:
+      bindings:
+        addArticle-in-0:
+          destination: articleExchange
+          group: articleQueue
+        addArticle-out-0:
+          destination: articleExchange
+        receiveArticleMessages-in-0:
+          destination: articleExchange
+          group: articleQueue
+        commentController-in-1:
+          destination: commentExchange
+        receiveCommentMessages-in-1:
+          destination: commentExchange
+          group: commentQueue

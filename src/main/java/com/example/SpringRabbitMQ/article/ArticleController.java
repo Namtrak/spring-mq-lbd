@@ -1,7 +1,10 @@
 package com.example.SpringRabbitMQ.article;
 
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import com.example.SpringRabbitMQ.configuration.ArticleSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.integration.support.MessageBuilder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,18 +13,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/article")
 public class ArticleController {
-    @Autowired
-    private RabbitTemplate rabbitTemplate;
+    private StreamBridge streamBridge;
+
+    public ArticleController(StreamBridge streamBridge) {
+        this.streamBridge = streamBridge;
+    }
 
     @PostMapping
     public void addArticle() {
-        rabbitTemplate.convertAndSend("article_exchange", "article_routingKey", "ARTICLE_CREATED");
-        System.out.println("(to article_queue) ARTICLE_CREATED");
+        streamBridge.send("articleExchange", "ARTICLE_CREATED");
+        System.out.println("(to articleExchange.articleQueue) ARTICLE_CREATED");
     }
 
     @PutMapping
     public void updateArticle() {
-        rabbitTemplate.convertAndSend("article_exchange", "article_routingKey", "ARTICLE_UPDATED");
-        System.out.println("(to article_queue) ARTICLE_UPDATED");
+        streamBridge.send("articleExchange", "ARTICLE_UPDATED");
+        System.out.println("(to articleExchange.articleQueue) ARTICLE_UPDATED");
     }
 }

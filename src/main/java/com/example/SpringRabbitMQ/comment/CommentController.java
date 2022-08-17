@@ -1,31 +1,36 @@
 package com.example.SpringRabbitMQ.comment;
 
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import com.example.SpringRabbitMQ.configuration.CommentSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.integration.support.MessageBuilder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/comment")
 public class CommentController {
+    private StreamBridge streamBridge;
 
-    @Autowired
-    private RabbitTemplate rabbitTemplate;
+    public CommentController(StreamBridge streamBridge) {
+        this.streamBridge = streamBridge;
+    }
 
     @PostMapping
     public void addComment() {
-        rabbitTemplate.convertAndSend("comment_exchange", "comment_routingKey", "COMMENT_CREATED");
-        System.out.println("(to comment_queue) COMMENT_CREATED");
+        streamBridge.send("commentExchange-out-0", "COMMENT_CREATED");
+        System.out.println("(to commentExchange.commentQueue) COMMENT_CREATED");
     }
 
     @PutMapping
     public void updateComment() {
-        rabbitTemplate.convertAndSend("comment_exchange", "comment_routingKey", "COMMENT_UPDATED");
-        System.out.println("(to comment_queue) COMMENT_UPDATED");
+        streamBridge.send("commentExchange", "COMMENT_UPDATED");
+        System.out.println("(to commentExchange.commentQueue) COMMENT_UPDATED");
     }
 
     @DeleteMapping
     public void deleteComment() {
-        rabbitTemplate.convertAndSend("comment_exchange", "comment_routingKey", "COMMENT_DELETED");
-        System.out.println("(to comment_queue) COMMENT_DELETED");
+        streamBridge.send("commentExchange", "COMMENT_DELETED");
+        System.out.println("(to commentExchange.commentQueue) COMMENT_DELETED");
     }
 }

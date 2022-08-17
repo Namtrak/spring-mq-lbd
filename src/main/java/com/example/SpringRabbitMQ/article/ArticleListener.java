@@ -1,13 +1,20 @@
 package com.example.SpringRabbitMQ.article;
 
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.annotation.StreamListener;
+import org.springframework.cloud.stream.messaging.Sink;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+
+import java.util.function.Consumer;
 
 @Component
 public class ArticleListener {
 
-    @RabbitListener(queues = "article_queue")
-    public void articleListener(String event) {
-        System.out.println("(from article_queue) " + event);
+    @Bean
+    public Consumer<String> receiveArticleMessages() {
+        return (message) -> {
+            System.out.println(message);
+        };
     }
 }

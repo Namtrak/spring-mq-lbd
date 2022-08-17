@@ -1,13 +1,20 @@
 package com.example.SpringRabbitMQ.comment;
 
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.annotation.StreamListener;
+import org.springframework.cloud.stream.messaging.Sink;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+
+import java.util.function.Consumer;
 
 @Component
 public class CommentListener {
 
-    @RabbitListener(queues = "comment_queue")
-    public void commentListener(String event) {
-        System.out.println("(from comment_queue) " + event);
+    @Bean
+    public Consumer<String> receiveCommentMessages() {
+        return (message) -> {
+            System.out.println(message);
+        };
     }
 }
